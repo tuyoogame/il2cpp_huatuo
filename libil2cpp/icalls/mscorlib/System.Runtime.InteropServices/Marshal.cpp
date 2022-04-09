@@ -592,13 +592,17 @@ namespace InteropServices
                         if (managedOffset != 0) // overlapping fields have a zero offset
                         {
                             offset += vm::Class::GetFieldMarshaledSize(previousField);
-                            int marshaledFieldAlignment = vm::Class::GetFieldMarshaledAlignment(field);
-                            offset = RoundUpToMultiple(offset, type->packingSize == 0 ? marshaledFieldAlignment : std::min((int)type->packingSize, marshaledFieldAlignment));
                         }
                     }
                     else
                     {
                         offset += vm::Class::FromIl2CppType(previousField->type)->native_size;
+                    }
+
+                    if (offset != 0)
+                    {
+                        int marshaledFieldAlignment = vm::Class::GetFieldMarshaledAlignment(field);
+                        offset = RoundUpToMultiple(offset, type->packingSize == 0 ? marshaledFieldAlignment : std::min((int)type->packingSize, marshaledFieldAlignment));
                     }
                 }
                 previousField = field;

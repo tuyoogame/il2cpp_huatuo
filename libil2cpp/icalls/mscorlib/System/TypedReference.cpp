@@ -57,12 +57,6 @@ namespace System
                 return res;
             }
 
-            if (f->field->parent != klass)
-            {
-                vm::Exception::Raise(vm::Exception::GetArgumentException("field", ""));
-                return res;
-            }
-
             if (i == 0)
                 value = (uint8_t*)target + f->field->offset;
             else

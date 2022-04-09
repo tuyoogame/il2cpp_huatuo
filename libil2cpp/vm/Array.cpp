@@ -133,7 +133,7 @@ namespace vm
         }
 #if !RUNTIME_TINY
         else if (klass->element_class->valuetype &&
-                 klass->element_class->gc_desc != GC_NO_DESCRIPTOR)
+                 ((GC_descr)klass->element_class->gc_desc & GC_DS_TAGS) == GC_DS_BITMAP)
         {
             o = (Il2CppObject*)GC_gcj_vector_malloc(byte_len, klass);
         }

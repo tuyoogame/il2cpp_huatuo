@@ -62,6 +62,11 @@ namespace os
             return (uint64_t)Read64((int64_t*)addr);
         }
 
+        static inline int32_t LoadRelaxed(const int32_t* addr)
+        {
+            return UnityPalLoadRelaxed(addr);
+        }
+
         template<typename T>
         static inline T* ReadPointer(T** pointer)
         {

@@ -541,7 +541,6 @@ namespace metadata
         klass->rank = rank;
 
         klass->instance_size = Class::GetInstanceSize(arrayClass);
-        klass->size_inited = true;
         klass->vtable_count = static_cast<uint16_t>(slots);
 
         // need this before we access the size or has_references
@@ -551,6 +550,8 @@ namespace metadata
         klass->native_size = klass->thread_static_fields_offset = -1;
 
         klass->has_references = Type::IsReference(&elementClass->byval_arg) || elementClass->has_references;
+
+        klass->size_inited = true; // set only after instance_size and has_references are set
 
         klass->element_class = elementClass;
 

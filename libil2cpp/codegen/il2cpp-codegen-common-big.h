@@ -365,3 +365,27 @@ inline bool il2cpp_codegen_platform_disable_libc_pinvoke()
 {
     return IL2CPP_PLATFORM_DISABLE_LIBC_PINVOKE;
 }
+
+template<typename T>
+inline T il2cpp_unsafe_read_unaligned(void* location)
+{
+    T result;
+#if IL2CPP_TARGET_ARMV7 || IL2CPP_TARGET_JAVASCRIPT
+    memcpy(&result, location, sizeof(T));
+#else
+    result = *((T*)location);
+#endif
+    return result;
+}
+
+#define IL2CPP_UNSAFE_READ_UNALIGNED(TReturnType, location) il2cpp_unsafe_read_unaligned<TReturnType>(location)
+
+template<typename T>
+inline void il2cpp_unsafe_write_unaligned(void* location, T value)
+{
+#if IL2CPP_TARGET_ARMV7 || IL2CPP_TARGET_JAVASCRIPT
+    memcpy(location, &value, sizeof(T));
+#else
+    *((T*)location) = value;
+#endif
+}

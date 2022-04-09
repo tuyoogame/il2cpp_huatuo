@@ -95,3 +95,8 @@ inline intptr_t UnityPalReadPtrVal(intptr_t* addr)
 {
     return Baselib_atomic_fetch_add_ptr_seq_cst(addr, 0);
 }
+
+inline int32_t UnityPalLoadRelaxed(const int32_t* addr)
+{
+    return Baselib_atomic_load_32_relaxed(addr);
+}

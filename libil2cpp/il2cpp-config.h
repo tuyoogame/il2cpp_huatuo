@@ -6,6 +6,19 @@
 #include "os/c-api/il2cpp-config-platforms.h"
 #include "os/c-api/il2cpp-config-api-platforms.h"
 
+/*UnityPluing*/
+#ifndef __ENABLE_UNITY_PLUGIN__
+#if IL2CPP_TARGET_ANDROID
+#define __ENABLE_UNITY_PLUGIN__ 1
+#else
+#define __ENABLE_UNITY_PLUGIN__ 0
+#endif
+#endif
+#if __ENABLE_UNITY_PLUGIN__
+
+#include "plugin/plugin.h"
+#endif // __ENABLE_UNITY_PLUGIN__
+
 #include "il2cpp-config-api.h"
 
 #include "il2cpp-sanitizers.h"
@@ -373,7 +386,7 @@ static const uint16_t kInvalidIl2CppMethodSlot = 65535;
 #define IL2CPP_VALIDATE_FIELD_LAYOUT 0
 
 #ifndef IL2CPP_USE_POSIX_COND_TIMEDWAIT_REL
-#define IL2CPP_USE_POSIX_COND_TIMEDWAIT_REL ( IL2CPP_TARGET_DARWIN || IL2CPP_TARGET_PSP2 || ( IL2CPP_TARGET_ANDROID && !IL2CPP_TARGET_ARM64 ) )
+#define IL2CPP_USE_POSIX_COND_TIMEDWAIT_REL ( IL2CPP_TARGET_DARWIN || IL2CPP_TARGET_PSP2 || ( IL2CPP_TARGET_ANDROID && !IL2CPP_TARGET_ARM64 && !__x86_64__ ) )
 #endif
 
 #if IL2CPP_MONO_DEBUGGER
@@ -544,6 +557,10 @@ char(*il2cpp_array_size_helper(Type(&array)[Size]))[Size];
 #endif
 
 #define IL2CPP_USE_GENERIC_ASSERT !(IL2CPP_TARGET_WINDOWS || IL2CPP_TARGET_XBOXONE || IL2CPP_TARGET_WINRT || IL2CPP_TARGET_PS4 || IL2CPP_TARGET_PS5)
+
+#ifndef IL2CPP_USE_SPARSEHASH
+#define IL2CPP_USE_SPARSEHASH (IL2CPP_TARGET_ANDROID || IL2CPP_TARGET_IOS)
+#endif
 
 #if !IL2CPP_DEBUG
 #define IL2CPP_ASSERT(expr) void(0)

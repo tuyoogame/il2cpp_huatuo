@@ -344,6 +344,13 @@ namespace utils
         return thread == s_DebuggerThread;
     }
 
+    static void InitializeUnwindState(Il2CppThreadUnwindState* unwindState, uint32_t frameCapacity)
+    {
+        unwindState->frameCount = 0;
+        unwindState->frameCapacity = frameCapacity;
+        unwindState->executionContexts = (Il2CppSequencePointExecutionContext**)calloc(frameCapacity, sizeof(Il2CppSequencePointExecutionContext*));
+    }
+
     void Debugger::AllocateThreadLocalData()
     {
         Il2CppThreadUnwindState* unwindState;
@@ -351,10 +358,26 @@ namespace utils
         if (unwindState == NULL)
         {
             unwindState = (Il2CppThreadUnwindState*)calloc(1, sizeof(Il2CppThreadUnwindState));
-            unwindState->frameCapacity = 512;
-            unwindState->executionContexts = (Il2CppSequencePointExecutionContext**)calloc(512, sizeof(Il2CppSequencePointExecutionContext*));
+            InitializeUnwindState(unwindState, 512);
             s_ExecutionContexts.SetValue(unwindState);
         }
+    }
+
+    void Debugger::GrowFrameCapacity(Il2CppThreadUnwindState* unwindState)
+    {
+        // Create a new unwind state object to hold the large array of execution context pointers
+        Il2CppThreadUnwindState newUnwindState;
+        InitializeUnwindState(&newUnwindState, unwindState->frameCapacity * 2);
+
+        // Copy the existing execution context pointers into the new one
+        memcpy(newUnwindState.executionContexts, unwindState->executionContexts, unwindState->frameCapacity * sizeof(Il2CppSequencePointExecutionContext*));
+
+        // Free the existing one
+        free(unwindState->executionContexts);
+
+        // Set the new data into the existing one, so the client can keep its object reference
+        unwindState->frameCapacity = newUnwindState.frameCapacity;
+        unwindState->executionContexts = newUnwindState.executionContexts;
     }
 
     void Debugger::FreeThreadLocalData()

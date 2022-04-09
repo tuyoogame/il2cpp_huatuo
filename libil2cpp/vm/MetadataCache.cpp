@@ -435,24 +435,40 @@ const Il2CppGenericInst* il2cpp::vm::MetadataCache::GetGenericInst(const Il2CppT
     for (const Il2CppType* const* iter = types; iter != typesEnd; ++iter, ++index)
         inst.type_argv[index] = *iter;
 
-    il2cpp::os::FastAutoLock lock(&s_MetadataCache.m_CacheMutex);
-    Il2CppGenericInstSet::const_iterator iter = s_GenericInstSet.find(&inst);
-    if (iter != s_GenericInstSet.end())
-        return *iter;
+    {
+        // Acquire lock to check if inst has already been cached.
+        il2cpp::os::FastAutoLock lock(&s_MetadataCache.m_CacheMutex);
+        Il2CppGenericInstSet::const_iterator iter = s_GenericInstSet.find(&inst);
+        if (iter != s_GenericInstSet.end())
+            return *iter;
+    }
 
-    Il2CppGenericInst* newInst = (Il2CppGenericInst*)MetadataMalloc(sizeof(Il2CppGenericInst));
-    newInst->type_argc = typeCount;
-    newInst->type_argv = (const Il2CppType**)MetadataMalloc(newInst->type_argc * sizeof(Il2CppType*));
+    Il2CppGenericInst* newInst = NULL;
+    {
+        il2cpp::os::FastAutoLock lock(&g_MetadataLock);
+        newInst  = (Il2CppGenericInst*)MetadataMalloc(sizeof(Il2CppGenericInst));
+        newInst->type_argc = typeCount;
+        newInst->type_argv = (const Il2CppType**)MetadataMalloc(newInst->type_argc * sizeof(Il2CppType*));
+    }
 
     index = 0;
     for (const Il2CppType* const* iter = types; iter != typesEnd; ++iter, ++index)
         newInst->type_argv[index] = *iter;
 
-    s_GenericInstSet.insert(newInst);
+    {
+        // Acquire lock agains to attempt to cache inst.
+        il2cpp::os::FastAutoLock lock(&s_MetadataCache.m_CacheMutex);
+        // Another thread may have already added this inst or we may be the first.
+        // In either case, the iterator returned from 'insert' points to the item
+        // cached within the set. We can always return this. In the case of another
+        // thread beating us, the only downside is an extra allocation in the
+        // metadata memory pool that lives for life of process anyway.
+        auto result = s_GenericInstSet.insert(newInst);
+        if (result.second)
+            ++il2cpp_runtime_stats.generic_instance_count;
 
-    ++il2cpp_runtime_stats.generic_instance_count;
-
-    return newInst;
+        return *(result.first);
+    }
 }
 
 const Il2CppGenericInst* il2cpp::vm::MetadataCache::GetGenericInst(const il2cpp::metadata::Il2CppTypeVector& types)

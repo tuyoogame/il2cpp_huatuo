@@ -369,44 +369,51 @@ namespace Threading
 
     int8_t Thread::VolatileReadInt8(volatile void* address)
     {
+        int8_t tmp = *reinterpret_cast<volatile int8_t*>(address);
         il2cpp::os::Atomic::FullMemoryBarrier();
-        return *reinterpret_cast<volatile int8_t*>(address);
+        return tmp;
     }
 
     int16_t Thread::VolatileReadInt16(volatile void* address)
     {
+        int16_t tmp = *reinterpret_cast<volatile int16_t*>(address);
         il2cpp::os::Atomic::FullMemoryBarrier();
-        return *reinterpret_cast<volatile int16_t*>(address);
+        return tmp;
     }
 
     int32_t Thread::VolatileReadInt32(volatile void* address)
     {
+        int32_t tmp = *reinterpret_cast<volatile int32_t*>(address);
         il2cpp::os::Atomic::FullMemoryBarrier();
-        return *reinterpret_cast<volatile int32_t*>(address);
+        return tmp;
     }
 
     int64_t Thread::VolatileReadInt64(volatile void* address)
     {
+        int64_t tmp = *reinterpret_cast<volatile int64_t*>(address);
         il2cpp::os::Atomic::FullMemoryBarrier();
-        return *reinterpret_cast<volatile int64_t*>(address);
+        return tmp;
     }
 
     float Thread::VolatileReadFloat(volatile void* address)
     {
+        float tmp = *reinterpret_cast<volatile float*>(address);
         il2cpp::os::Atomic::FullMemoryBarrier();
-        return *reinterpret_cast<volatile float*>(address);
+        return tmp;
     }
 
     double Thread::VolatileReadDouble(volatile void* address)
     {
+        double tmp = *reinterpret_cast<volatile double*>(address);
         il2cpp::os::Atomic::FullMemoryBarrier();
-        return *reinterpret_cast<volatile double*>(address);
+        return tmp;
     }
 
     void* Thread::VolatileReadPtr(volatile void* address)
     {
+        void* tmp = *reinterpret_cast<void* volatile*>(address);
         il2cpp::os::Atomic::FullMemoryBarrier();
-        return *reinterpret_cast<void* volatile*>(address);
+        return tmp;
     }
 
     intptr_t Thread::VolatileReadIntPtr(volatile void* address)
@@ -416,44 +423,44 @@ namespace Threading
 
     void Thread::VolatileWriteInt8(volatile void* address, int8_t value)
     {
-        *reinterpret_cast<volatile int8_t*>(address) = value;
         il2cpp::os::Atomic::FullMemoryBarrier();
+        *reinterpret_cast<volatile int8_t*>(address) = value;
     }
 
     void Thread::VolatileWriteInt16(volatile void* address, int16_t value)
     {
-        *reinterpret_cast<volatile int16_t*>(address) = value;
         il2cpp::os::Atomic::FullMemoryBarrier();
+        *reinterpret_cast<volatile int16_t*>(address) = value;
     }
 
     void Thread::VolatileWriteInt32(volatile void* address, int32_t value)
     {
-        *reinterpret_cast<volatile int32_t*>(address) = value;
         il2cpp::os::Atomic::FullMemoryBarrier();
+        *reinterpret_cast<volatile int32_t*>(address) = value;
     }
 
     void Thread::VolatileWriteInt64(volatile void* address, int64_t value)
     {
-        *reinterpret_cast<volatile int64_t*>(address) = value;
         il2cpp::os::Atomic::FullMemoryBarrier();
+        *reinterpret_cast<volatile int64_t*>(address) = value;
     }
 
     void Thread::VolatileWriteFloat(volatile void* address, float value)
     {
-        *reinterpret_cast<volatile float*>(address) = value;
         il2cpp::os::Atomic::FullMemoryBarrier();
+        *reinterpret_cast<volatile float*>(address) = value;
     }
 
     void Thread::VolatileWriteDouble(volatile void* address, double value)
     {
-        *reinterpret_cast<volatile double*>(address) = value;
         il2cpp::os::Atomic::FullMemoryBarrier();
+        *reinterpret_cast<volatile double*>(address) = value;
     }
 
     void Thread::VolatileWritePtr(volatile void* address, void* value)
     {
-        *reinterpret_cast<void* volatile*>(address) = value;
         il2cpp::os::Atomic::FullMemoryBarrier();
+        *reinterpret_cast<void* volatile*>(address) = value;
     }
 
     void Thread::VolatileWriteIntPtr(volatile void* address, intptr_t value)
@@ -510,6 +517,13 @@ namespace Threading
 
     int32_t Thread::GetState40(Il2CppInternalThread* thread)
     {
+        // There is a chance that the managed thread object can be used from code (like a
+        // finalizer) after it has been destroyed. In that case, the objects that
+        // the runtime uses to track this thread may have been freed. Try to check for
+        // that case here and return early.
+        if (thread == NULL || thread->synch_cs == NULL)
+            return vm::kThreadStateStopped;
+
         il2cpp::os::FastAutoLock lock(thread->synch_cs);
         return (il2cpp::vm::ThreadState)thread->state;
     }

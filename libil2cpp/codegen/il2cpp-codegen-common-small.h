@@ -1,6 +1,7 @@
 #pragma once
 
 #include "il2cpp-object-internals.h"
+#include <cmath>
 
 inline void il2cpp_codegen_initobj(void* value, size_t size)
 {
@@ -21,6 +22,21 @@ inline TOutput il2cpp_codegen_cast_floating_point(TFloat value)
         return (TOutput)((TInput)(TOutput)value);
 #endif
     return (TOutput)((TInput)value);
+}
+
+// ARM targets handle a cast of floating point positive infinity (0x7F800000)
+// differently from Intel targets. The expected behavior for .NET is from Intel,
+// where the cast to a 32-bit int produces the value 0x80000000. On ARM, the sign
+// is unchanged, producing 0x7FFFFFFF. To work around this change the positive
+// infinity value to negative infinity.
+template<typename T>
+inline T il2cpp_codegen_cast_double_to_int(double value)
+{
+#if IL2CPP_TARGET_ARM64 || IL2CPP_TARGET_ARMV7
+    if (value == INFINITY)
+        return (T)-value;
+#endif
+    return (T)value;
 }
 
 template<bool, class T, class U>

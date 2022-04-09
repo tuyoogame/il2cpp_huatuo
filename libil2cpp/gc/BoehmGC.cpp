@@ -355,7 +355,15 @@ il2cpp::gc::GarbageCollector::MakeDescriptorForObject(size_t *bitmap, int numbit
     if (numbits >= 30)
         return GC_NO_DESCRIPTOR;
     else
-        return (void*)GC_make_descriptor((GC_bitmap)bitmap, numbits);
+    {
+        GC_descr desc = GC_make_descriptor((GC_bitmap)bitmap, numbits);
+        // we should always have a GC_DS_BITMAP descriptor, as we:
+        // 1) Always want a precise marker.
+        // 2) Can never be GC_DS_LENGTH since we always have an object header
+        //    at the beginning of the allocation.
+        IL2CPP_ASSERT((desc & GC_DS_TAGS) == GC_DS_BITMAP || (desc & GC_DS_TAGS) == (GC_descr)GC_NO_DESCRIPTOR);
+        return (void*)desc;
+    }
 #else
     return 0;
 #endif

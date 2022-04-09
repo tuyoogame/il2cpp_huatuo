@@ -238,7 +238,7 @@ namespace os
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
 
-        if (*hostname && getaddrinfo(hostname, NULL, &hints, &info) == -1)
+        if (getaddrinfo(hostname, NULL, &hints, &info) == -1)
             return kWaitStatusFailure;
 
         AddrinfoGetAddresses(info, name, add_local_ips, addr_list);

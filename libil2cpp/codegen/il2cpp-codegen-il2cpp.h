@@ -81,6 +81,14 @@ struct Il2CppFakeBox : RuntimeObject
     }
 };
 
+struct Il2CppMetadataObject : RuntimeObject
+{
+    Il2CppMetadataObject(RuntimeClass* boxedType)
+    {
+        klass = boxedType;
+    }
+};
+
 inline bool il2cpp_codegen_is_fake_boxed_object(RuntimeObject* object)
 {
     return object->monitor == IL2CPP_FAKE_BOX_SENTRY;
@@ -392,6 +400,7 @@ inline void ArrayGetGenericValueImpl(RuntimeArray* thisPtr, int32_t pos, void* v
 inline void ArraySetGenericValueImpl(RuntimeArray * thisPtr, int32_t pos, void* value)
 {
     memcpy(((uint8_t*)thisPtr) + sizeof(RuntimeArray) + pos * thisPtr->klass->element_size, value, thisPtr->klass->element_size);
+    Il2CppCodeGenWriteBarrier((void**)(((uint8_t*)thisPtr) + sizeof(RuntimeArray) + pos * thisPtr->klass->element_size), value);
 }
 
 RuntimeArray* SZArrayNew(RuntimeClass* arrayType, uint32_t length);

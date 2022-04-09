@@ -107,6 +107,8 @@ namespace utils
         std::string symbolMapFileName = "SymbolMap-ARMv7";
     #elif defined(__aarch64__)
         std::string symbolMapFileName = "SymbolMap-ARM64";
+    #elif defined(__x86_64__)
+        std::string symbolMapFileName = "SymbolMap-x86_64";
     #else
         #error Unknown symbol map file name
     #endif

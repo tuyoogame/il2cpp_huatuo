@@ -12,7 +12,7 @@ namespace os
     class LibraryLoader
     {
     public:
-        static Il2CppMethodPointer GetHardcodedPInvokeDependencyFunctionPointer(const il2cpp::utils::StringView<Il2CppNativeChar>& nativeDynamicLibrary, const il2cpp::utils::StringView<char>& entryPoint);
+        static Il2CppMethodPointer GetHardcodedPInvokeDependencyFunctionPointer(const il2cpp::utils::StringView<Il2CppNativeChar>& nativeDynamicLibrary, const il2cpp::utils::StringView<char>& entryPoint, Il2CppCharSet charSet);
         static void* LoadDynamicLibrary(const utils::StringView<Il2CppNativeChar> nativeDynamicLibrary);
         static void* LoadDynamicLibrary(const utils::StringView<Il2CppNativeChar> nativeDynamicLibrary, int flags);
         static Il2CppMethodPointer GetFunctionPointer(void* dynamicLibrary, const PInvokeArguments& pinvokeArgs);
@@ -23,6 +23,7 @@ namespace os
     private:
         static void* LoadDynamicLibraryImpl(const utils::StringView<Il2CppNativeChar>& nativeDynamicLibrary);
         static void* LoadDynamicLibraryImpl(const utils::StringView<Il2CppNativeChar>& nativeDynamicLibrary, int flags);
+        static bool EntryNameMatches(const il2cpp::utils::StringView<char>& hardcodedEntryPoint, const il2cpp::utils::StringView<char>& entryPoint);
     };
 } /* namespace os */
 } /* namespace il2cpp*/

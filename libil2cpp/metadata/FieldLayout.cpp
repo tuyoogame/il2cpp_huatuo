@@ -160,7 +160,7 @@ namespace metadata
 
             // For fields, we might not want to take the actual alignment of the type - that might account for
             // packing. When a type is used as a field, we should not care about its alignment with packing,
-            // instead let's use its natural alignment, without reagard for packing. So if it's alignment
+            // instead let's use its natural alignment, without regard for packing. So if it's alignment
             // is less than the compiler's minimum alignment (4 bytes), lets use the natural alignment if we have it.
             uint8_t alignment = sa.alignment;
             if (alignment < 4 && sa.naturalAlignment != 0)
@@ -175,7 +175,7 @@ namespace metadata
             data.FieldOffsets.push_back(offset);
             data.actualClassSize = offset + std::max(sa.size, (size_t)1);
             data.minimumAlignment = std::max(data.minimumAlignment, alignment);
-            data.naturalAlignment = std::max(data.naturalAlignment, sa.alignment);
+            data.naturalAlignment = std::max({data.naturalAlignment, sa.alignment, sa.naturalAlignment});
         }
 
         data.classSize = AlignTo(data.actualClassSize, data.minimumAlignment);

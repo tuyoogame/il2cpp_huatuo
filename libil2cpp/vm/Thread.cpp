@@ -212,8 +212,14 @@ namespace vm
             MONO_PROFILER_RAISE(thread_stopped, ((uintptr_t)thread->GetInternalThread()->tid));
 #endif
 
-        Unregister(thread);
         FreeThreadStaticData(thread);
+
+        // Call Unregister after all access to managed objects (Il2CppThread and Il2CppInternalThread)
+        // is complete. Unregister will remove the managed thread object from the GC tracked vector of
+        // attached threads, and allow it to be finalized and re-used. If runtime code accesses it
+        // after a call to Unregister, there will be a race condition between the GC and the runtime
+        // code for access to that object.
+        Unregister(thread);
 
 #if IL2CPP_MONO_DEBUGGER
         utils::Debugger::FreeThreadLocalData();

@@ -36,8 +36,7 @@ namespace vm
         // Some platforms, like UWP, just don't allow you to load to load system libraries at runtime dynamically.
         // On other platforms (THEY SHALL NOT BE NAMED :O), while the functions that mscorlib.dll wants to P/Invoke into exist,
         // They exist in different system libraries than it is said in the DllImport attribute.
-        Il2CppMethodPointer function = os::LibraryLoader::GetHardcodedPInvokeDependencyFunctionPointer(pinvokeArgs.moduleName, pinvokeArgs.entryPoint);
-
+        Il2CppMethodPointer function = os::LibraryLoader::GetHardcodedPInvokeDependencyFunctionPointer(pinvokeArgs.moduleName, pinvokeArgs.entryPoint, pinvokeArgs.charSet);
         if (function != NULL)
             return function;
 
@@ -364,7 +363,7 @@ namespace vm
     // that was wrapped in the fake MethodInfo.
     static bool IsFakeDelegateMethodMarshaledFromNativeCode(const MethodInfo* method)
     {
-        return method->methodMetadataHandle == NULL && method->is_marshaled_from_native;
+        return method->is_marshaled_from_native;
     }
 
     static bool IsGenericInstance(const Il2CppType* type)
@@ -393,7 +392,7 @@ namespace vm
             return 0;
 
         if (IsFakeDelegateMethodMarshaledFromNativeCode(d->method))
-            return reinterpret_cast<intptr_t>(d->method->methodPointer);
+            return reinterpret_cast<intptr_t>(d->method->nativeFunction);
 
         IL2CPP_ASSERT(d->method->methodMetadataHandle);
 
@@ -451,11 +450,12 @@ namespace vm
         {
             const MethodInfo* invoke = il2cpp::vm::Runtime::GetDelegateInvoke(delegateType);
             MethodInfo* newMethod = (MethodInfo*)IL2CPP_CALLOC(1, sizeof(MethodInfo));
-            newMethod->methodPointer = nativeFunctionPointer;
-            newMethod->invoker_method = NULL;
-            newMethod->parameters_count = invoke->parameters_count;
+            memcpy(newMethod, invoke, sizeof(MethodInfo));
+            newMethod->methodPointer = managedToNativeWrapperMethodPointer;
+            newMethod->nativeFunction = nativeFunctionPointer;
             newMethod->slot = kInvalidIl2CppMethodSlot;
             newMethod->is_marshaled_from_native = true;
+            newMethod->flags &= ~METHOD_ATTRIBUTE_VIRTUAL;
             utils::NativeDelegateMethodCache::AddNativeDelegate(nativeFunctionPointer, newMethod);
             method = newMethod;
         }
