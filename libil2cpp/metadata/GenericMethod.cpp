@@ -21,6 +21,11 @@
 #include "il2cpp-runtime-stats.h"
 #include <string>
 
+// ==={{ huatuo
+#include "huatuo/metadata/MetadataUtil.h"
+#include "huatuo/interpreter/InterpreterModule.h"
+// ===}} huatuo
+
 using il2cpp::metadata::GenericMetadata;
 using il2cpp::metadata::GenericSharing;
 using il2cpp::os::FastAutoLock;
@@ -121,8 +126,18 @@ namespace metadata
             newMethod->rgctx_data = GenericMetadata::InflateRGCTX(gmethod->methodDefinition->klass->image, gmethod->methodDefinition->token, &gmethod->context);
         }
 
-        newMethod->invoker_method = MetadataCache::GetInvokerMethodPointer(methodDefinition, &gmethod->context);
-        newMethod->methodPointer = MetadataCache::GetMethodPointer(methodDefinition, &gmethod->context);
+        // ==={{ huatuo
+        if (huatuo::metadata::IsInterpreterMethod(newMethod))
+        {
+            newMethod->invoker_method = huatuo::interpreter::InterpreterModule::GetMethodInvoker(newMethod);
+            newMethod->methodPointer = newMethod->klass->valuetype && huatuo::metadata::IsInstanceMethod(newMethod) ? huatuo::interpreter::InterpreterModule::GetAdjustThunkMethodPointer(newMethod) : huatuo::interpreter::InterpreterModule::GetMethodPointer(newMethod);
+        }
+        else
+        {
+            newMethod->invoker_method = MetadataCache::GetInvokerMethodPointer(methodDefinition, &gmethod->context);
+            newMethod->methodPointer = MetadataCache::GetMethodPointer(methodDefinition, &gmethod->context);
+        }
+        // ===}} huatuo
 
         ++il2cpp_runtime_stats.inflated_method_count;
 
