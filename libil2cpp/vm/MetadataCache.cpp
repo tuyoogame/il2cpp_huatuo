@@ -902,6 +902,21 @@ const Il2CppAssembly* il2cpp::vm::MetadataCache::GetOrLoadAssemblyByName(const c
     return nullptr;
 }
 
+const Il2CppAssembly* il2cpp::vm::MetadataCache::LoadAssemblyFromFile(const char* assemblyFile)
+{
+    il2cpp::os::FastAutoLock lock(&il2cpp::vm::g_MetadataLock);
+
+    Il2CppAssembly* newAssembly = huatuo::metadata::Assembly::LoadFromFile(assemblyFile);
+    if (newAssembly)
+    {
+        il2cpp::vm::Assembly::Register(newAssembly);
+        s_cliAssemblies.push_back(newAssembly);
+        return newAssembly;
+    }
+
+    return nullptr;
+}
+
 const Il2CppAssembly* il2cpp::vm::MetadataCache::LoadAssemblyFromBytes(const char* assemblyBytes, size_t length)
 {
     il2cpp::os::FastAutoLock lock(&il2cpp::vm::g_MetadataLock);

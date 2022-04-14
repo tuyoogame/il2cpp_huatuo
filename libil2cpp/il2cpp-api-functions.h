@@ -307,3 +307,10 @@ DO_API(void, il2cpp_class_set_userdata, (Il2CppClass * klass, void* userdata));
 DO_API(int, il2cpp_class_get_userdata_offset, ());
 
 DO_API(void, il2cpp_set_default_thread_affinity, (int64_t affinity_mask));
+
+// ==={{ huatuo
+#if IL2CPP_TARGET_WINDOWS
+
+DO_API(int, il2cpp_test, ());
+#endif
+// ===}} huatuo
