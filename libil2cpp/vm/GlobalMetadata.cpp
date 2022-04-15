@@ -1125,7 +1125,7 @@ bool il2cpp::vm::GlobalMetadata::HasAttribute(const Il2CppImage* image, uint32_t
     // ==={{ huatuo
     if (huatuo::metadata::IsInterpreterImage(image))
     {
-        return false;
+        return huatuo::metadata::MetadataModule::HasAttribute(image, token, attribute);
     }
     // ===}} huatuo
     CustomAttributeIndex index = GetCustomAttributeIndex(image, token);
