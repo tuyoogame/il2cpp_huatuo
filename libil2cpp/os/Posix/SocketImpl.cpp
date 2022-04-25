@@ -2437,8 +2437,15 @@ namespace os
             case kSocketOptionNameSendTimeout:
             case kSocketOptionNameReceiveTimeout:
             {
-                socklen_t time_ms_size = sizeof(*first);
-                ret = getsockopt(_fd, system_level, system_name, (char*)first, &time_ms_size);
+                struct timeval time;
+                socklen_t time_size = sizeof(time);
+                ret = getsockopt(_fd, system_level, system_name, &time, &time_size);
+
+                // Use a 64-bit integer to avoid overflow
+                uint64_t timeInMilliseconds = (time.tv_sec * (uint64_t)1000) + (time.tv_usec / 1000);
+
+                // Truncate back to a 32-bit integer to return the value back to the caller.
+                *first = (int32_t)timeInMilliseconds;
             }
             break;
 
