@@ -17,7 +17,15 @@ namespace InteropServices
 {
     Il2CppString* RuntimeInformation::GetOSName()
     {
+#if IL2CPP_TARGET_WINDOWS_DESKTOP
+        return vm::String::New("windows");
+#elif IL2CPP_TARGET_OSX
+        return vm::String::New("osx");
+#elif IL2CPP_TARGET_LINUX
+        return vm::String::New("linux");
+#else
         return vm::String::New("unknown");
+#endif
     }
 
     Il2CppString* RuntimeInformation::GetRuntimeArchitecture()
