@@ -1157,6 +1157,11 @@ CustomAttributesCache* il2cpp::vm::GlobalMetadata::GenerateCustomAttributesCache
 
 static bool HasAttributeFromTypeRange(const Il2CppImage* image, const Il2CppCustomAttributeDataRange* dataRange, Il2CppClass* attribute)
 {
+    if (huatuo::metadata::IsInterpreterIndex(dataRange->startOffset))
+    {
+        return huatuo::metadata::MetadataModule::GetImageByEncodedIndex(dataRange->startOffset)->HasAttribute(dataRange, attribute);
+    }
+
     void* start = MetadataOffset<uint8_t*>(s_GlobalMetadata, s_GlobalMetadataHeader->attributeDataOffset, dataRange->startOffset);
     void* end = MetadataOffset<uint8_t*>(s_GlobalMetadata, s_GlobalMetadataHeader->attributeDataOffset, (dataRange + 1)->startOffset);
 
