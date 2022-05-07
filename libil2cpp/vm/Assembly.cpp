@@ -31,16 +31,9 @@ namespace vm
     AssemblyVector* Assembly::GetAllAssemblies(bool includeUnInited/* = false*/)
     {
 // ==={{ huatuo
-        if (includeUnInited)
-        {
-            AssemblyVector* assembly = os::Atomic::ReadPointer(&s_Assemblies);
+
+            AssemblyVector* assembly = includeUnInited ? os::Atomic::ReadPointer(&s_Assemblies) : os::Atomic::ReadPointer(&s_AssembliesInited);
             return assembly ? assembly : &s_emptyAssemblies;
-        }
-        else
-        {
-			AssemblyVector* assembly = os::Atomic::ReadPointer(&s_AssembliesInited);
-			return assembly ? assembly : &s_emptyAssemblies;
-        }
 // ===}} huatuo
     }
 
@@ -179,6 +172,11 @@ namespace vm
         {
             // TODO ???
         }
+        delete oldAssemblies;
+
+        oldAssemblies = s_AssembliesInited;
+        s_AssembliesInited = nullptr;
+        delete oldAssemblies;
 // ===}} huatuo
     }
 
