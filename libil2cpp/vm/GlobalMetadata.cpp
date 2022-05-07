@@ -257,8 +257,11 @@ const Il2CppParameterDefinition* il2cpp::vm::GlobalMetadata::GetParameterDefinit
 
 static const Il2CppMethodDefinition* GetMethodDefinitionFromEncodedIndex(EncodedMethodIndex methodIndex)
 {
-
     const MethodInfo* method = GetMethodInfoFromEncodedIndex(methodIndex);
+    if (!method)
+    {
+        return nullptr;
+    }
     if (method->is_inflated)
     {
         method = method->genericMethod->methodDefinition;
