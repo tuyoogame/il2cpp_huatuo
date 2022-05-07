@@ -22,7 +22,7 @@ namespace vm
         static Il2CppImage* GetImage(const Il2CppAssembly* assembly);
         static void GetReferencedAssemblies(const Il2CppAssembly* assembly, AssemblyNameVector* target);
     public:
-        static AssemblyVector* GetAllAssemblies();
+        static AssemblyVector* GetAllAssemblies(bool includeUnInited = false);
         static const Il2CppAssembly* GetLoadedAssembly(const char* name);
         static const Il2CppAssembly* Load(const char* name);
         static void Register(const Il2CppAssembly* assembly);

@@ -25,13 +25,22 @@ namespace vm
     // copy on write
     static AssemblyVector s_emptyAssemblies;
     static AssemblyVector* s_Assemblies = nullptr;
+    static AssemblyVector* s_AssembliesInited = nullptr;
     // ===}} huatuo
 
-    AssemblyVector* Assembly::GetAllAssemblies()
+    AssemblyVector* Assembly::GetAllAssemblies(bool includeUnInited/* = false*/)
     {
 // ==={{ huatuo
-        AssemblyVector* assembly = os::Atomic::ReadPointer(&s_Assemblies);
-        return assembly ? assembly : &s_emptyAssemblies;
+        if (includeUnInited)
+        {
+            AssemblyVector* assembly = os::Atomic::ReadPointer(&s_Assemblies);
+            return assembly ? assembly : &s_emptyAssemblies;
+        }
+        else
+        {
+			AssemblyVector* assembly = os::Atomic::ReadPointer(&s_AssembliesInited);
+			return assembly ? assembly : &s_emptyAssemblies;
+        }
 // ===}} huatuo
     }
 
@@ -123,19 +132,40 @@ namespace vm
 // ==={{ huatuo
         os::FastAutoLock lock(&s_assemblyLock);
 
-        AssemblyVector* oldAssemblies = s_Assemblies;
-
-        // TODO IL2CPP_MALLOC ???
-        AssemblyVector* newAssemblies = oldAssemblies ? new AssemblyVector(*oldAssemblies) : new AssemblyVector();
-        newAssemblies->push_back(assembly);
-
-        os::Atomic::FullMemoryBarrier();
-        os::Atomic::ExchangePointer(&s_Assemblies, newAssemblies);
-        if (oldAssemblies)
         {
-            // can't delete
-            // delete oldAssemblies;
+            AssemblyVector* oldAssemblies = s_Assemblies;
+
+            // TODO IL2CPP_MALLOC ???
+            AssemblyVector* newAssemblies = oldAssemblies ? new AssemblyVector(*oldAssemblies) : new AssemblyVector();
+            if (std::find(newAssemblies->begin(), newAssemblies->end(), assembly) == newAssemblies->end())
+            {
+                newAssemblies->push_back(assembly);
+
+                os::Atomic::FullMemoryBarrier();
+                os::Atomic::ExchangePointer(&s_Assemblies, newAssemblies);
+                if (oldAssemblies)
+                {
+                    // can't delete
+                    // delete oldAssemblies;
+                }
+            }
         }
+        
+        if(assembly->image->metadataHandle != nullptr) // inited
+        {
+            AssemblyVector* oldAssemblies = s_AssembliesInited;
+
+            // TODO IL2CPP_MALLOC ???
+            AssemblyVector* newAssemblies = oldAssemblies ? new AssemblyVector(*oldAssemblies) : new AssemblyVector();
+            if (std::find(newAssemblies->begin(), newAssemblies->end(), assembly) == newAssemblies->end())
+            {
+                newAssemblies->push_back(assembly);
+
+                os::Atomic::FullMemoryBarrier();
+                os::Atomic::ExchangePointer(&s_AssembliesInited, newAssemblies);
+            }
+        }
+
 // ===}} huatuo
     }
 
