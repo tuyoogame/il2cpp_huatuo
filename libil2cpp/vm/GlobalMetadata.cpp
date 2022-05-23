@@ -771,6 +771,10 @@ Il2CppMetadataTypeHandle il2cpp::vm::GlobalMetadata::GetAssemblyTypeHandle(const
 const Il2CppAssembly* il2cpp::vm::GlobalMetadata::GetReferencedAssembly(const Il2CppAssembly* assembly, int32_t referencedAssemblyTableIndex, const Il2CppAssembly assembliesTable[], int assembliesCount)
 {
     IL2CPP_ASSERT(referencedAssemblyTableIndex < assembly->referencedAssemblyCount);
+    if (huatuo::metadata::IsInterpreterImage(assembly->image))
+    {
+        return huatuo::metadata::MetadataModule::GetImage(assembly->image)->GetReferencedAssembly(referencedAssemblyTableIndex, assembliesTable, assembliesCount);
+    }
 
     referencedAssemblyTableIndex = assembly->referencedAssemblyStart + referencedAssemblyTableIndex;
 
