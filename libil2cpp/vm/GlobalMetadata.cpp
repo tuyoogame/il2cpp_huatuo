@@ -454,10 +454,6 @@ bool il2cpp::vm::GlobalMetadata::Initialize(int32_t* imagesCount, int32_t* assem
     s_GenericMethodTable = (const Il2CppGenericMethod**)IL2CPP_CALLOC(s_Il2CppMetadataRegistration->methodSpecsCount, sizeof(Il2CppGenericMethod*));
 
     ProcessIl2CppTypeDefinitions(InitializeTypeHandle, InitializeGenericParameterHandle);
-
-    // ==={{ huatuo
-    huatuo::metadata::MetadataModule::Initialize();
-    // ===}} huatuo
     return true;
 }
 
