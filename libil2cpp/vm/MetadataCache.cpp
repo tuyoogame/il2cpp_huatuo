@@ -925,6 +925,14 @@ const Il2CppAssembly* il2cpp::vm::MetadataCache::LoadAssemblyFromBytes(const cha
     Il2CppAssembly* newAssembly = huatuo::metadata::Assembly::LoadFromBytes(assemblyBytes, length, true);
     if (newAssembly)
     {
+        // avoid register placeholder assembly twicely.
+        for (Il2CppAssembly* ass : s_cliAssemblies)
+        {
+            if (ass == newAssembly)
+            {
+                return ass;
+            }
+        }
         il2cpp::vm::Assembly::Register(newAssembly);
         s_cliAssemblies.push_back(newAssembly);
         return newAssembly;
