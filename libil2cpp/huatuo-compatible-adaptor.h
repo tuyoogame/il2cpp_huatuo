@@ -60,15 +60,15 @@ namespace huatuo
 	inline void InitNullableValueType(void* nullableValueTypeObj, void* data, Il2CppClass* klass)
 	{
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
+		std::memmove(nullableValueTypeObj, data, size);
 		*((uint8_t*)nullableValueTypeObj + size) = 1;
-		memcpy(nullableValueTypeObj, data, size);
 	}
 
 	inline void NewNullableValueType(void* nullableValueTypeObj, void* data, Il2CppClass* klass)
 	{
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
+		std::memmove(nullableValueTypeObj, data, size);
 		*((uint8_t*)nullableValueTypeObj + size) = 1;
-		memcpy(nullableValueTypeObj, data, size);
 	}
 
 	inline bool IsNullableHasValue(void* nullableValueObj, Il2CppClass* klass)
@@ -82,7 +82,7 @@ namespace huatuo
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
 		if (*((uint8_t*)nullableValueObj + size))
 		{
-			std::memcpy(dst, nullableValueObj, size);
+			std::memmove(dst, nullableValueObj, size);
 		}
 		else
 		{
@@ -93,7 +93,7 @@ namespace huatuo
 	inline void GetNullableValueOrDefault(void* dst, void* nullableValueObj, void* defaultData, Il2CppClass* klass)
 	{
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
-		std::memcpy(dst, *((uint8_t*)nullableValueObj + size) ? nullableValueObj : defaultData, size);
+		std::memmove(dst, *((uint8_t*)nullableValueObj + size) ? nullableValueObj : defaultData, size);
 	}
 
 	inline void GetNullableValue(void* dst, void* nullableValueObj, Il2CppClass* klass)
@@ -101,7 +101,7 @@ namespace huatuo
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
 		if (*((uint8_t*)nullableValueObj + size))
 		{
-			std::memcpy(dst, nullableValueObj, size);
+			std::memmove(dst, nullableValueObj, size);
 		}
 		else
 		{
