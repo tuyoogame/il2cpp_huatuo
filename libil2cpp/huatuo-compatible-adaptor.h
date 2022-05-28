@@ -61,9 +61,9 @@ namespace huatuo
 	inline void InitNullableValueType(void* nullableValueTypeObj, void* data, Il2CppClass* klass)
 	{
 		IL2CPP_ASSERT(klass->fields[0].offset == sizeof(Il2CppObject));
-		*((uint8_t*)nullableValueTypeObj) = 1;
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
-		memcpy((uint8_t*)nullableValueTypeObj + klass->fields[1].offset - sizeof(Il2CppObject), data, size);
+		std::memmove((uint8_t*)nullableValueTypeObj + klass->fields[1].offset - sizeof(Il2CppObject), data, size);
+		*((uint8_t*)nullableValueTypeObj) = 1;
 	}
 
 	inline void NewNullableValueType(void* nullableValueTypeObj, void* data, Il2CppClass* klass)
@@ -83,7 +83,7 @@ namespace huatuo
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
 		if (*((uint8_t*)nullableValueObj))
 		{
-			std::memcpy(dst, (uint8_t*)nullableValueObj + klass->fields[1].offset - sizeof(Il2CppObject), size);
+			std::memmove(dst, (uint8_t*)nullableValueObj + klass->fields[1].offset - sizeof(Il2CppObject), size);
 		}
 		else
 		{
@@ -95,7 +95,7 @@ namespace huatuo
 	{
 		IL2CPP_ASSERT(klass->fields[0].offset == sizeof(Il2CppObject));
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
-		std::memcpy(dst, *((uint8_t*)nullableValueObj) ? (uint8_t*)nullableValueObj + klass->fields[1].offset - sizeof(Il2CppObject) : defaultData, size);
+		std::memmove(dst, *((uint8_t*)nullableValueObj) ? (uint8_t*)nullableValueObj + klass->fields[1].offset - sizeof(Il2CppObject) : defaultData, size);
 	}
 
 	inline void GetNullableValue(void* dst, void* nullableValueObj, Il2CppClass* klass)
@@ -104,7 +104,7 @@ namespace huatuo
 		uint32_t size = klass->castClass->instance_size - sizeof(Il2CppObject);
 		if (*((uint8_t*)nullableValueObj))
 		{
-			std::memcpy(dst, (uint8_t*)nullableValueObj + klass->fields[1].offset - sizeof(Il2CppObject), size);
+			std::memmove(dst, (uint8_t*)nullableValueObj + klass->fields[1].offset - sizeof(Il2CppObject), size);
 		}
 		else
 		{
