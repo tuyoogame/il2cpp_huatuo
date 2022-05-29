@@ -112,6 +112,6 @@ namespace huatuo
 	inline Il2CppString* GetKlassFullName(const Il2CppType* type)
 	{
 		Il2CppReflectionType* refType = il2cpp::icalls::mscorlib::System::Type::internal_from_handle((intptr_t)type);
-		return il2cpp::icalls::mscorlib::System::MonoType::getFullName(refType, true, false);
+		return il2cpp::icalls::mscorlib::System::MonoType::getFullName(refType, false, false);
 	}
 }
