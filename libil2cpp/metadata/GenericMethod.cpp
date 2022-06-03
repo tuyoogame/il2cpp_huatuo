@@ -23,6 +23,7 @@
 
 // ==={{ huatuo
 #include "huatuo/metadata/MetadataUtil.h"
+#include "huatuo/metadata/MetadataModule.h"
 #include "huatuo/interpreter/InterpreterModule.h"
 // ===}} huatuo
 
@@ -252,7 +253,16 @@ namespace metadata
             newMethod->invoker_method = Runtime::GetMissingMethodInvoker();
             if (Method::IsInstance(newMethod))
                 newMethod->virtualMethodPointer = MetadataCache::GetUnresolvedVirtualCallStub(newMethod);
+            if (!newMethod->invoker_method && huatuo::metadata::MetadataModule::IsImplementedByInterpreter(newMethod))
+            {
+                newMethod->invoker_method = huatuo::interpreter::InterpreterModule::GetMethodInvoker(newMethod);
+            }
+            if (!newMethod->methodPointer && huatuo::metadata::MetadataModule::IsImplementedByInterpreter(newMethod))
+            {
+                newMethod->methodPointer = IS_CLASS_VALUE_TYPE(newMethod->klass) && huatuo::metadata::IsInstanceMethod(newMethod) ? huatuo::interpreter::InterpreterModule::GetAdjustThunkMethodPointer(newMethod) : huatuo::interpreter::InterpreterModule::GetMethodPointer(newMethod);
+            }
         }
+        // ===}} huatuo
 
         newMethod->has_full_generic_sharing_signature = methodPointers.isFullGenericShared && HasFullGenericSharedParametersOrReturn(gmethod->methodDefinition);
 
