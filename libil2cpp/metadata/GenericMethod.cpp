@@ -237,6 +237,7 @@ namespace metadata
         {
             newMethod->invoker_method = huatuo::interpreter::InterpreterModule::GetMethodInvoker(newMethod);
             newMethod->methodPointer = IS_CLASS_VALUE_TYPE(newMethod->klass) && huatuo::metadata::IsInstanceMethod(newMethod) ? huatuo::interpreter::InterpreterModule::GetAdjustThunkMethodPointer(newMethod) : huatuo::interpreter::InterpreterModule::GetMethodPointer(newMethod);
+            newMethod->virtualMethodPointer = Method::IsInstance(newMethod) ? huatuo::interpreter::InterpreterModule::GetMethodPointer(newMethod) : nullptr;
             ++il2cpp_runtime_stats.inflated_method_count;
             return newMethod;
         }
@@ -248,19 +249,17 @@ namespace metadata
         {
             newMethod->invoker_method = methodPointers.invoker_method;
         }
+        else if (huatuo::metadata::MetadataModule::IsImplementedByInterpreter(newMethod))
+        {
+            newMethod->invoker_method = huatuo::interpreter::InterpreterModule::GetMethodInvoker(newMethod);
+            newMethod->methodPointer = IS_CLASS_VALUE_TYPE(newMethod->klass) && huatuo::metadata::IsInstanceMethod(newMethod) ? huatuo::interpreter::InterpreterModule::GetAdjustThunkMethodPointer(newMethod) : huatuo::interpreter::InterpreterModule::GetMethodPointer(newMethod);
+            newMethod->virtualMethodPointer = Method::IsInstance(newMethod) ? huatuo::interpreter::InterpreterModule::GetMethodPointer(newMethod) : nullptr;
+        }
         else
         {
             newMethod->invoker_method = Runtime::GetMissingMethodInvoker();
             if (Method::IsInstance(newMethod))
                 newMethod->virtualMethodPointer = MetadataCache::GetUnresolvedVirtualCallStub(newMethod);
-            if (!newMethod->invoker_method && huatuo::metadata::MetadataModule::IsImplementedByInterpreter(newMethod))
-            {
-                newMethod->invoker_method = huatuo::interpreter::InterpreterModule::GetMethodInvoker(newMethod);
-            }
-            if (!newMethod->methodPointer && huatuo::metadata::MetadataModule::IsImplementedByInterpreter(newMethod))
-            {
-                newMethod->methodPointer = IS_CLASS_VALUE_TYPE(newMethod->klass) && huatuo::metadata::IsInstanceMethod(newMethod) ? huatuo::interpreter::InterpreterModule::GetAdjustThunkMethodPointer(newMethod) : huatuo::interpreter::InterpreterModule::GetMethodPointer(newMethod);
-            }
         }
         // ===}} huatuo
 
